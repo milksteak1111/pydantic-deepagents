@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic_ai import Agent
 from pydantic_ai.messages import (
@@ -86,12 +86,12 @@ def _count_tokens_approximately(messages: Sequence[ModelMessage]) -> int:  # pra
                 elif isinstance(part, ToolReturnPart):
                     total_chars += len(str(part.content))
         elif isinstance(msg, ModelResponse):
-            for part in msg.parts:
-                if isinstance(part, TextPart):
-                    total_chars += len(part.content)
-                elif isinstance(part, ToolCallPart):
-                    total_chars += len(part.tool_name)
-                    total_chars += len(str(part.args))
+            for response_part in msg.parts:
+                if isinstance(response_part, TextPart):
+                    total_chars += len(response_part.content)
+                elif isinstance(response_part, ToolCallPart):
+                    total_chars += len(response_part.tool_name)
+                    total_chars += len(str(response_part.args))
 
     return total_chars // 4
 
@@ -349,8 +349,11 @@ class SummarizationProcessor:
             for j in range(i + 1, len(messages)):
                 check_msg = messages[j]
                 if isinstance(check_msg, ModelRequest):
-                    for part in check_msg.parts:
-                        if isinstance(part, ToolReturnPart) and part.tool_call_id in tool_call_ids:
+                    for request_part in check_msg.parts:
+                        if (
+                            isinstance(request_part, ToolReturnPart)
+                            and request_part.tool_call_id in tool_call_ids
+                        ):
                             tool_before_cutoff = i < cutoff_index
                             response_before_cutoff = j < cutoff_index
                             if tool_before_cutoff != response_before_cutoff:
@@ -463,7 +466,7 @@ def create_summarization_processor(
         )
         ```
     """
-    kwargs: dict = {
+    kwargs: dict[str, Any] = {
         "model": model,
         "trigger": trigger,
         "keep": keep,

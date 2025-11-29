@@ -53,7 +53,7 @@ class TestTokenCounting:
                             {"type": "text", "text": "Hello"},
                             {"type": "text", "text": "World"},
                         ]
-                    )  # type: ignore[arg-type]
+                    )
                 ]
             )
         ]
@@ -111,7 +111,7 @@ class TestFormatMessages:
                             {"type": "text", "text": "Hello"},
                             {"type": "text", "text": "World"},
                         ]
-                    )  # type: ignore[arg-type]
+                    )
                 ]
             )
         ]
@@ -121,11 +121,7 @@ class TestFormatMessages:
     def test_format_user_message_multipart_empty(self):
         """Test formatting multipart user messages with no text."""
         messages: list[ModelMessage] = [
-            ModelRequest(
-                parts=[
-                    UserPromptPart(content=[{"type": "image", "data": "..."}])  # type: ignore[arg-type]
-                ]
-            )
+            ModelRequest(parts=[UserPromptPart(content=[{"type": "image", "data": "..."}])])
         ]
         formatted = _format_messages_for_summary(messages)
         assert formatted == ""
@@ -416,7 +412,7 @@ class TestSummarizationProcessor:
         with pytest.raises(ValueError, match="Unsupported context size type"):
             SummarizationProcessor(
                 model="anthropic:claude-sonnet-4-20250514",
-                trigger=("invalid", 10),  # type: ignore[arg-type]
+                trigger=("invalid", 10),
             )
 
     def test_create_processor_with_custom_token_counter(self):

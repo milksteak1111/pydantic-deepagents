@@ -11,7 +11,7 @@ from typing_extensions import NotRequired
 
 # Re-export OutputSpec from pydantic-ai for structured output support
 # This allows users to specify the response format for agents
-ResponseFormat = OutputSpec
+ResponseFormat = OutputSpec[object]
 
 # Type variable for output types
 OutputT = TypeVar("OutputT")
