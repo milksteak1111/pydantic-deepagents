@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 from pydantic_ai import Agent
+from pydantic_ai.models import Model
 from pydantic_ai.tools import Tool
 
 from pydantic_deep.backends.protocol import BackendProtocol, SandboxProtocol
@@ -46,7 +47,7 @@ You are a helpful AI assistant with access to planning, filesystem, subagent, an
 
 
 def create_deep_agent(  # noqa: C901
-    model: str | None = None,
+    model: str | Model | None = None,
     instructions: str | None = None,
     tools: Sequence[Tool[DeepAgentDeps] | Any] | None = None,
     toolsets: Sequence[AbstractToolset[DeepAgentDeps]] | None = None,
@@ -135,10 +136,12 @@ def create_deep_agent(  # noqa: C901
         all_toolsets.append(fs_toolset)
 
     if include_subagents:
+        # For subagents, convert model to string if it's a Model instance
+        subagent_model = model if isinstance(model, str) else DEFAULT_MODEL
         subagent_toolset = create_subagent_toolset(
             id="deep-subagents",
             subagents=subagents,
-            default_model=model,
+            default_model=subagent_model,
             include_general_purpose=include_general_purpose_subagent,
         )
         all_toolsets.append(subagent_toolset)
@@ -178,7 +181,7 @@ def create_deep_agent(  # noqa: C901
 
     # Add dynamic system prompts
     @agent.instructions
-    def dynamic_instructions(ctx) -> str:  # pragma: no cover
+    def dynamic_instructions(ctx: Any) -> str:  # pragma: no cover
         """Generate dynamic instructions based on current state."""
         parts = []
 

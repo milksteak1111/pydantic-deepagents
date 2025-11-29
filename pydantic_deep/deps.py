@@ -32,7 +32,7 @@ class DeepAgentDeps:
     todos: list[Todo] = field(default_factory=list)
     subagents: dict[str, Any] = field(default_factory=dict)  # Agent instances
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize backend with files if using StateBackend."""
         if isinstance(self.backend, StateBackend) and self.files:
             # Sync files to state backend

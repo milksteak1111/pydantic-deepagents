@@ -145,7 +145,8 @@ def create_subagent_toolset(
 
             # Add custom tools if any
             for tool in tools:
-                subagent.tool(tool)
+                if callable(tool):
+                    subagent.tool(tool)
 
             # Cache the subagent
             ctx.deps.subagents[subagent_type] = subagent

@@ -74,7 +74,7 @@ class SubAgentConfig(TypedDict):
     name: str
     description: str
     instructions: str
-    tools: NotRequired[list]
+    tools: NotRequired[list[object]]
     model: NotRequired[str]
 
 

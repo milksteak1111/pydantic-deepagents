@@ -156,9 +156,11 @@ class StateBackend:
         # Split content into lines, preserving empty lines
         lines = content.split("\n")
 
+        existing = self._files.get(path)
+        created_at = existing["created_at"] if existing else now
         self._files[path] = FileData(
             content=lines,
-            created_at=self._files.get(path, {}).get("created_at", now),
+            created_at=created_at,
             modified_at=now,
         )
 

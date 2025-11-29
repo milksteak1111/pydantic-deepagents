@@ -247,7 +247,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         self._auto_remove = auto_remove
         self._container = None
 
-    def _ensure_container(self):
+    def _ensure_container(self) -> None:
         """Ensure Docker container is running."""
         if self._container is not None:
             return
@@ -273,6 +273,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
     def execute(self, command: str, timeout: int | None = None) -> ExecuteResponse:
         """Execute command in Docker container."""
         self._ensure_container()
+        assert self._container is not None  # Ensured by _ensure_container()
 
         try:
             exit_code, output = self._container.exec_run(
@@ -301,7 +302,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
                 truncated=False,
             )
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop and remove the container."""
         import contextlib
 
@@ -310,7 +311,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
                 self._container.stop()
             self._container = None
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Cleanup container on deletion."""
         self.stop()
 
