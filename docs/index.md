@@ -4,9 +4,9 @@
 Deep Agent Framework, the Pydantic AI way
 </p>
 
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/vstorm-co/pydantic-deep)
+[![PyPI version](https://img.shields.io/pypi/v/pydantic-deep.svg)](https://pypi.org/project/pydantic-deep/)
+[![CI](https://github.com/vstorm-co/pydantic-deep/actions/workflows/ci.yml/badge.svg)](https://github.com/vstorm-co/pydantic-deep/actions/workflows/ci.yml)
 [![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/vstorm-co/pydantic-deep)
-[![pypi](https://img.shields.io/badge/pypi-v0.1.0-blue)](https://pypi.org/project/pydantic-deep/)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
 [![license](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
 

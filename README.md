@@ -1,8 +1,10 @@
 # pydantic-deep
 
+[![PyPI version](https://img.shields.io/pypi/v/pydantic-deep.svg)](https://pypi.org/project/pydantic-deep/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/vstorm-co/pydantic-deep)
+[![CI](https://github.com/vstorm-co/pydantic-deep/actions/workflows/ci.yml/badge.svg)](https://github.com/vstorm-co/pydantic-deep/actions/workflows/ci.yml)
 
 Deep agent framework built on [pydantic-ai](https://github.com/pydantic/pydantic-ai) with planning, filesystem, and subagent capabilities.
 
@@ -55,7 +57,16 @@ asyncio.run(main())
 
 ## Documentation
 
-Full documentation is available at the [docs site](https://github.com/vstorm-co/pydantic-deep).
+- **[Full Documentation](https://vstorm-co.github.io/pydantic-deep/)** - Complete guides and API reference
+- **[PyPI Package](https://pypi.org/project/pydantic-deep/)** - Package information and releases
+- **[GitHub Repository](https://github.com/vstorm-co/pydantic-deep)** - Source code and issues
+
+### Quick Links
+
+- [Installation Guide](https://vstorm-co.github.io/pydantic-deep/installation/)
+- [Core Concepts](https://vstorm-co.github.io/pydantic-deep/concepts/)
+- [Examples](https://vstorm-co.github.io/pydantic-deep/examples/)
+- [API Reference](https://vstorm-co.github.io/pydantic-deep/api/)
 
 ## Development
 
@@ -70,7 +81,7 @@ make install
 # Run tests
 make test
 
-# Run all checks
+# Run all checks (lint, typecheck, test, coverage)
 make all
 ```
 
