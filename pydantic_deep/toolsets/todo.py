@@ -67,6 +67,18 @@ When working on tasks:
 """
 
 
+READ_TODO_DESCRIPTION = """
+Read the current todo list state.
+
+Use this tool to check the current status of all tasks before:
+- Deciding what to work on next
+- Updating task statuses
+- Reporting progress to the user
+
+Returns all todos with their current status (pending, in_progress, completed).
+"""
+
+
 def create_todo_toolset(id: str | None = None) -> FunctionToolset[DeepAgentDeps]:
     """Create a todo toolset for task management.
 
@@ -74,9 +86,41 @@ def create_todo_toolset(id: str | None = None) -> FunctionToolset[DeepAgentDeps]
         id: Optional unique ID for the toolset.
 
     Returns:
-        FunctionToolset with the write_todos tool.
+        FunctionToolset with read_todos and write_todos tools.
     """
     toolset: FunctionToolset[DeepAgentDeps] = FunctionToolset(id=id)
+
+    @toolset.tool(description=READ_TODO_DESCRIPTION)
+    async def read_todos(ctx: RunContext[DeepAgentDeps]) -> str:  # pragma: no cover
+        """Read the current todo list.
+
+        Returns the current state of all todos with their status.
+        """
+        if not ctx.deps.todos:
+            return "No todos in the list. Use write_todos to create tasks."
+
+        lines = ["Current todos:"]
+        for i, todo in enumerate(ctx.deps.todos, 1):
+            status_icon = {
+                "pending": "[ ]",
+                "in_progress": "[*]",
+                "completed": "[x]",
+            }.get(todo.status, "[ ]")
+            lines.append(f"{i}. {status_icon} {todo.content}")
+
+        # Add summary
+        counts = {"pending": 0, "in_progress": 0, "completed": 0}
+        for todo in ctx.deps.todos:
+            counts[todo.status] += 1
+
+        lines.append("")
+        lines.append(
+            f"Summary: {counts['completed']} completed, "
+            f"{counts['in_progress']} in progress, "
+            f"{counts['pending']} pending"
+        )
+
+        return "\n".join(lines)
 
     @toolset.tool
     async def write_todos(  # pragma: no cover
