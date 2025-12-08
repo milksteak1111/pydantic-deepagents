@@ -15,6 +15,13 @@ class TestTodoToolset:
         toolset = create_todo_toolset(id="test-todo")
         assert toolset.id == "test-todo"
 
+    def test_toolset_has_read_and_write_tools(self):
+        """Test that toolset has both read_todos and write_todos."""
+        toolset = create_todo_toolset()
+        tool_names = list(toolset.tools.keys())
+        assert "read_todos" in tool_names
+        assert "write_todos" in tool_names
+
     def test_get_todo_system_prompt_empty(self):
         """Test system prompt with no todos."""
         deps = DeepAgentDeps(backend=StateBackend())
