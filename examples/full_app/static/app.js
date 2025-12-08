@@ -24,6 +24,7 @@ const todosList = document.getElementById('todos-list');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    setupResizer();
     connectWebSocket();
     refreshFiles();
     refreshTodos();
@@ -60,7 +61,6 @@ function connectWebSocket() {
 }
 
 function updateConnectionStatus(connected) {
-    // Could add a visual indicator here
     sendBtn.disabled = !connected;
 }
 
@@ -74,17 +74,15 @@ function handleWebSocketMessage(event) {
 
     switch (data.type) {
         case 'session_created':
-            // Server created a new session for us
             sessionId = data.session_id;
             localStorage.setItem('sessionId', sessionId);
             console.log('New session created:', sessionId);
             break;
 
         case 'start':
-            // Create new message container for this response
             currentMessageEl = createMessageContainer('assistant');
             currentToolsEl = null;
-            streamedText = '';  // Reset streamed text
+            streamedText = '';
             break;
 
         case 'status':
@@ -92,17 +90,14 @@ function handleWebSocketMessage(event) {
             break;
 
         case 'tool_call_start':
-            // Tool call is starting - create placeholder with streaming args
             startToolCallStreaming(data.tool_name, data.tool_call_id);
             break;
 
         case 'tool_args_delta':
-            // Streaming tool arguments chunk
             appendToolArgsDelta(data.tool_name, data.args_delta);
             break;
 
         case 'tool_start':
-            // Tool execution is starting (after args are complete)
             addToolEvent(data.tool_name, data.args);
             break;
 
@@ -111,17 +106,14 @@ function handleWebSocketMessage(event) {
             break;
 
         case 'text_delta':
-            // Streaming text chunk - append to current message
             appendTextChunk(data.content);
             break;
 
         case 'thinking_delta':
-            // Streaming thinking content (for reasoning models like o1)
             appendThinkingChunk(data.content);
             break;
 
         case 'response':
-            // Final response - replace streaming content with formatted version
             if (currentMessageEl) {
                 const contentEl = currentMessageEl.querySelector('.message-content');
                 if (contentEl) {
@@ -153,16 +145,16 @@ function createMessageContainer(type) {
     messageEl.id = id;
 
     const labelMap = {
-        'user': {text: 'You', icon: 'icon-user'},
-        'assistant': {text: 'Deep Agent', icon: 'icon-ai'},
-        'system': {text: 'System', icon: 'icon-system'}
+        'user': {text: 'You', icon: 'icon-user', i: 'ri-user-smile-line'},
+        'assistant': {text: 'Deep Agent', icon: 'icon-ai', i: 'ri-robot-2-fill'},
+        'system': {text: 'System', icon: 'icon-system', i: 'ri-error-warning-fill'}
     };
 
     const info = labelMap[type] || labelMap['system'];
 
     messageEl.innerHTML = `
         <div class="message-header ${info.icon}">
-            <span>${info.text}</span>
+            <i class="${info.i}"></i> <span>${info.text}</span>
         </div>
         <div class="message-tools"></div>
         <div class="message-content"></div>
@@ -184,7 +176,7 @@ function updateStatus(status) {
         statusEl.style.cssText = "font-size: 11px; color: #666; font-family: monospace; margin-top: 4px; padding-left: 1rem;";
         currentMessageEl.appendChild(statusEl);
     }
-    statusEl.textContent = `> ${status}`;
+    statusEl.innerHTML = `<i class="ri-loader-4-line"></i> ${escapeHtml(status)}`;
 }
 
 // Streaming tool args accumulator
@@ -196,7 +188,6 @@ function startToolCallStreaming(toolName, toolCallId) {
     const toolsEl = currentMessageEl.querySelector('.message-tools');
     if (!toolsEl) return;
 
-    // Reset streaming args
     streamingToolArgs = '';
 
     const toolEl = document.createElement('div');
@@ -235,10 +226,8 @@ function addToolEvent(toolName, args) {
     const toolsEl = currentMessageEl.querySelector('.message-tools');
     if (!toolsEl) return;
 
-    // Check if we already have a streaming tool element for this
     const existingStreamingTool = toolsEl.querySelector('.tool-call.streaming');
     if (existingStreamingTool) {
-        // Update existing element with final args
         existingStreamingTool.classList.remove('streaming');
         const statusEl = existingStreamingTool.querySelector('.tool-status');
         if (statusEl) {
@@ -254,7 +243,6 @@ function addToolEvent(toolName, args) {
         return;
     }
 
-    // Create new tool element (for non-streamed tools)
     const toolEl = document.createElement('div');
     toolEl.className = 'tool-call';
     toolEl.innerHTML = `
@@ -317,7 +305,6 @@ function appendTextChunk(chunk) {
 
     const contentEl = currentMessageEl.querySelector('.message-content');
     if (contentEl) {
-        // Use textContent for streaming (faster), will be replaced with formatted HTML on 'response'
         contentEl.textContent = streamedText;
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
@@ -326,12 +313,11 @@ function appendTextChunk(chunk) {
 function appendThinkingChunk(chunk) {
     if (!currentMessageEl) return;
 
-    // Get or create thinking container
     let thinkingEl = currentMessageEl.querySelector('.message-thinking');
     if (!thinkingEl) {
         thinkingEl = document.createElement('div');
         thinkingEl.className = 'message-thinking';
-        thinkingEl.innerHTML = '<span class="thinking-label">💭 Thinking...</span><div class="thinking-content"></div>';
+        thinkingEl.innerHTML = '<span class="thinking-label"><i class="ri-brain-line"></i> Thinking...</span><div class="thinking-content"></div>';
         const contentEl = currentMessageEl.querySelector('.message-content');
         currentMessageEl.insertBefore(thinkingEl, contentEl);
     }
@@ -345,13 +331,9 @@ function appendThinkingChunk(chunk) {
 
 function finishMessage() {
     if (currentMessageEl) {
-        // Remove status indicator
         const statusEl = currentMessageEl.querySelector('.message-status');
-        if (statusEl) {
-            statusEl.remove();
-        }
+        if (statusEl) statusEl.remove();
 
-        // Mark all tools as done
         const toolStatuses = currentMessageEl.querySelectorAll('.tool-status.running');
         toolStatuses.forEach(el => {
             el.className = 'tool-status done';
@@ -368,7 +350,7 @@ function showError(message) {
     if (currentMessageEl) {
         const contentEl = currentMessageEl.querySelector('.message-content');
         if (contentEl) {
-            contentEl.innerHTML = `<span class="error">Error: ${escapeHtml(message)}</span>`;
+            contentEl.innerHTML = `<span class="error"><i class="ri-error-warning-line"></i> Error: ${escapeHtml(message)}</span>`;
         }
     } else {
         addMessage(`Error: ${message}`, 'system');
@@ -383,7 +365,6 @@ let pendingApprovals = [];
 function showApprovalDialog(requests) {
     pendingApprovals = requests;
 
-    // Create approval UI in the current message
     if (!currentMessageEl) {
         currentMessageEl = createMessageContainer('assistant');
     }
@@ -392,14 +373,14 @@ function showApprovalDialog(requests) {
     if (!contentEl) return;
 
     let html = '<div class="approval-dialog">';
-    html += '<h4>Approval Required</h4>';
+    html += '<h4><i class="ri-alert-line"></i> Approval Required</h4>';
     html += '<p>The following operations require your approval:</p>';
 
     for (const req of requests) {
         html += `
             <div class="approval-item" data-id="${req.tool_call_id}">
                 <div class="approval-tool">
-                    <span class="tool-icon">&#9881;</span>
+                    <span class="tool-icon"><i class="ri-settings-5-line"></i></span>
                     <strong>${escapeHtml(req.tool_name)}</strong>
                 </div>
                 <div class="approval-args">${formatToolArgs(req.args)}</div>
@@ -421,29 +402,24 @@ function showApprovalDialog(requests) {
 function handleApprovalResponse(approved) {
     if (!pendingApprovals.length) return;
 
-    // Build approval response
     const approvalResponse = {};
     for (const req of pendingApprovals) {
         approvalResponse[req.tool_call_id] = approved;
     }
 
-    // Clear pending
     pendingApprovals = [];
 
-    // Update UI
     if (currentMessageEl) {
         const contentEl = currentMessageEl.querySelector('.message-content');
         if (contentEl) {
-            contentEl.innerHTML = `<p>${approved ? 'Approved' : 'Denied'} - continuing...</p>`;
+            contentEl.innerHTML = `<p>${approved ? '<i class="ri-check-line"></i> Approved' : '<i class="ri-close-line"></i> Denied'} - continuing...</p>`;
         }
     }
 
-    // Send approval response via WebSocket
     ws.send(JSON.stringify({approval: approvalResponse}));
 }
 
 function setupEventListeners() {
-    // Message input
     messageInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -451,16 +427,17 @@ function setupEventListeners() {
         }
     });
 
-    // Auto-resize textarea
     messageInput.addEventListener('input', () => {
         messageInput.style.height = 'auto';
         messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
     });
 
-    // File upload
+    uploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
     fileInput.addEventListener('change', handleFileSelect);
 
-    // Drag and drop
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadArea.classList.add('dragover');
@@ -479,7 +456,6 @@ function setupEventListeners() {
         }
     });
 
-    // Tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -487,6 +463,39 @@ function setupEventListeners() {
             currentTab = btn.dataset.tab;
             refreshFiles();
         });
+    });
+}
+
+function setupResizer() {
+    const resizer = document.getElementById('drag-handle');
+    const root = document.documentElement;
+    let isResizing = false;
+
+    resizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        resizer.classList.add('active');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none'; // Prevent text selection
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+
+        // Calculate new width (constrain between 200px and 600px)
+        let newWidth = e.clientX;
+        if (newWidth < 200) newWidth = 200;
+        if (newWidth > 600) newWidth = 600;
+
+        root.style.setProperty('--sidebar-width', `${newWidth}px`);
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            resizer.classList.remove('active');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        }
     });
 }
 
@@ -501,17 +510,12 @@ function sendMessage() {
         return;
     }
 
-    // Clear input
     messageInput.value = '';
     messageInput.style.height = 'auto';
 
-    // Add user message
     addMessage(message, 'user');
-
-    // Disable send button while processing
     sendBtn.disabled = true;
 
-    // Send via WebSocket with session_id
     const payload = {message};
     if (sessionId) {
         payload.session_id = sessionId;
@@ -530,10 +534,15 @@ function addMessage(content, type) {
     messageEl.className = `message ${type}`;
     messageEl.id = id;
 
-    const label = type === 'user' ? 'You' : type === 'assistant' ? 'Agent' : 'System';
+    const labelMap = {
+        'user': {text: 'You', i: 'ri-user-smile-line'},
+        'assistant': {text: 'Agent', i: 'ri-robot-2-fill'},
+        'system': {text: 'System', i: 'ri-error-warning-fill'}
+    };
+    const info = labelMap[type];
 
     messageEl.innerHTML = `
-        <span class="message-label">${label}</span>
+        <span class="message-header"><i class="${info.i}"></i> ${info.text}</span>
         <div class="message-content">${formatMessage(content)}</div>
     `;
 
@@ -544,25 +553,17 @@ function addMessage(content, type) {
 }
 
 function formatMessage(content) {
-    // Convert markdown-like syntax to HTML
     let html = escapeHtml(content);
-
-    // Code blocks
     html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-
-    // Inline code
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // Bold
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-    // Line breaks
     html = html.replace(/\n/g, '<br>');
-
+    html = linkifyFilePaths(html);
     return html;
 }
 
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
@@ -577,32 +578,25 @@ function handleFileSelect(e) {
 }
 
 async function uploadFile(file) {
-    uploadStatus.textContent = `Uploading ${file.name}...`;
+    uploadStatus.innerHTML = `<i class="ri-loader-4-line spin"></i> Uploading ${file.name}...`;
     uploadStatus.className = '';
 
     const formData = new FormData();
     formData.append('file', file);
 
-    // Build URL with session_id
     let url = '/upload';
     if (sessionId) {
         url += `?session_id=${encodeURIComponent(sessionId)}`;
     }
 
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData
-        });
-
+        const response = await fetch(url, { method: 'POST', body: formData });
         const data = await response.json();
 
         if (response.ok) {
-            uploadStatus.textContent = `Uploaded: ${data.filename}`;
+            uploadStatus.innerHTML = `<i class="ri-check-line"></i> Uploaded: ${data.filename}`;
             uploadStatus.className = 'success';
             refreshFiles();
-
-            // Add system message about upload
             addMessage(`File uploaded: ${data.filename} (${formatBytes(data.size)})`, 'system');
         } else {
             uploadStatus.textContent = `Error: ${data.detail}`;
@@ -613,10 +607,7 @@ async function uploadFile(file) {
         uploadStatus.className = 'error';
     }
 
-    // Clear input
     fileInput.value = '';
-
-    // Clear status after 3 seconds
     setTimeout(() => {
         uploadStatus.textContent = '';
         uploadStatus.className = '';
@@ -624,11 +615,11 @@ async function uploadFile(file) {
 }
 
 async function refreshFiles() {
-    if (!sessionId) return;  // No session yet
+    if (!sessionId) return;
 
     try {
         const response = await fetch(`/files?session_id=${encodeURIComponent(sessionId)}`);
-        if (!response.ok) return;  // Session may not exist yet
+        if (!response.ok) return;
         const data = await response.json();
 
         const files = currentTab === 'uploads' ? data.uploads : data.workspace;
@@ -640,13 +631,12 @@ async function refreshFiles() {
 
         filesList.innerHTML = files.map(file => {
             const name = typeof file === 'string' ? file.split('/').pop() : file;
-            const downloadLink = currentTab === 'workspace'
-                ? `<a href="/files/download/${file}" target="_blank">&#11015;</a>`
-                : '';
+            const fullPath = typeof file === 'string' ? file : `/${currentTab}/${file}`;
+            const iconClass = getFileIconClass(name);
             return `
-                <div class="file-item">
-                    <span title="${file}">${name}</span>
-                    ${downloadLink}
+                <div class="file-item clickable" onclick="openFilePreview('${escapeHtml(fullPath)}')" title="Click to preview ${fullPath}">
+                    <i class="${iconClass}"></i>
+                    <span>${escapeHtml(name)}</span>
                 </div>
             `;
         }).join('');
@@ -656,11 +646,11 @@ async function refreshFiles() {
 }
 
 async function refreshTodos() {
-    if (!sessionId) return;  // No session yet
+    if (!sessionId) return;
 
     try {
         const response = await fetch(`/todos?session_id=${encodeURIComponent(sessionId)}`);
-        if (!response.ok) return;  // Session may not exist yet
+        if (!response.ok) return;
         const data = await response.json();
 
         if (!data.todos || data.todos.length === 0) {
@@ -670,7 +660,7 @@ async function refreshTodos() {
 
         todosList.innerHTML = data.todos.map(todo => `
             <div class="todo-item">
-                <div class="todo-status ${todo.status}"></div>
+                <i class="ri-checkbox-circle-line" style="color:var(--success)"></i>
                 <span>${escapeHtml(todo.content)}</span>
             </div>
         `).join('');
@@ -688,41 +678,263 @@ async function resetAgent() {
         if (sessionId) {
             await fetch(`/reset?session_id=${encodeURIComponent(sessionId)}`, {method: 'POST'});
         }
-        // Clear session ID - will get a new one on reconnect
         sessionId = null;
         localStorage.removeItem('sessionId');
 
-        // Clear messages except welcome
         messagesContainer.innerHTML = '';
         addMessage(`
             <p><strong>Agent Reset!</strong> Ready to start fresh.</p>
-            <ul>
-                <li><strong>File Operations</strong> - Upload CSV/PDF, read, write, edit files</li>
-                <li><strong>GitHub Tools</strong> - Query repos, issues, PRs (mock data)</li>
-                <li><strong>Code Execution</strong> - Run Python in a Docker sandbox</li>
-                <li><strong>Data Analysis</strong> - Load the skill for CSV analysis</li>
-                <li><strong>Joke Generator</strong> - Ask me to tell jokes!</li>
-            </ul>
         `, 'system');
 
         refreshFiles();
         refreshTodos();
 
-        // Reconnect WebSocket
-        if (ws) {
-            ws.close();
-        }
+        if (ws) ws.close();
         connectWebSocket();
     } catch (error) {
         alert('Error resetting agent: ' + error.message);
     }
 }
 
-// Utility
 function formatBytes(bytes) {
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+// ============================================
+// File Preview Panel & Viewers
+// ============================================
+
+let currentPreviewPath = null;
+let currentPreviewContent = null;
+
+const filePreviewPanel = document.getElementById('file-preview-panel');
+const previewFilename = document.getElementById('preview-filename');
+const previewContainer = document.getElementById('preview-container');
+const previewIcon = document.getElementById('preview-icon');
+
+async function openFilePreview(filePath) {
+    if (!sessionId) return;
+
+    try {
+        // Prepare UI
+        const filename = filePath.split('/').pop();
+        previewFilename.textContent = filename;
+        const iconClass = getFileIconClass(filename);
+        previewIcon.innerHTML = `<i class="${iconClass}"></i>`;
+
+        filePreviewPanel.classList.remove('hidden');
+        previewContainer.innerHTML = '<div style="padding: 20px; color: var(--text-muted);">Loading...</div>';
+
+        // Fetch
+        const response = await fetch(`/files/content/${encodeURIComponent(filePath)}?session_id=${encodeURIComponent(sessionId)}`);
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to load file');
+        }
+
+        const data = await response.json();
+        currentPreviewPath = filePath;
+        currentPreviewContent = data.content;
+
+        renderPreview(filename, data.content);
+
+    } catch (error) {
+        console.error('Error loading file:', error);
+        previewContainer.innerHTML = `<div style="padding: 20px; color: var(--error);">Error loading file: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function renderPreview(filename, content) {
+    const ext = filename.split('.').pop().toLowerCase();
+
+    // 1. Image Preview
+    if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext)) {
+        // Assuming the backend doesn't return Base64 in content, but we can display via URL?
+        // Since the current backend returns "content", it works best for text files.
+        // For now, let's treat images as a placeholder or check if content is base64.
+        previewContainer.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%;">
+            <p style="color:var(--text-muted)">Image preview requires binary endpoint</p>
+        </div>`;
+        return;
+    }
+
+    // 2. CSV Reader
+    if (ext === 'csv') {
+        const tableHtml = parseCSVtoTable(content);
+        previewContainer.innerHTML = `<div class="csv-container">${tableHtml}</div>`;
+        return;
+    }
+
+    // 3. PDF Reader (Simple Embed)
+    if (ext === 'pdf') {
+        // We attempt to construct a path. If the backend serves static files, this works.
+        // Otherwise, we can't display it purely from the 'content' text string unless it's base64.
+        // We will assume standard path access for the demo.
+        // Hack: create a temporary blob if content implies binary, but usually content is just text here.
+        previewContainer.innerHTML = `
+            <embed class="embed-container" src="/files/download/${encodeURIComponent(currentPreviewPath)}?session_id=${sessionId}" type="application/pdf">
+        `;
+        return;
+    }
+
+    // 4. Code / Text (PrismJS)
+    const languageMap = {
+        'js': 'javascript', 'py': 'python', 'rs': 'rust', 'html': 'html',
+        'css': 'css', 'json': 'json', 'md': 'markdown', 'sh': 'bash',
+        'ts': 'typescript', 'go': 'go', 'java': 'java', 'cpp': 'cpp'
+    };
+
+    const lang = languageMap[ext] || 'none';
+
+    const pre = document.createElement('pre');
+    const code = document.createElement('code');
+    code.className = `language-${lang}`;
+    code.textContent = content; // Safely sets text
+
+    pre.appendChild(code);
+    previewContainer.innerHTML = ''; // clear
+    previewContainer.appendChild(pre);
+
+    // Trigger highlighting
+    if (window.Prism) {
+        Prism.highlightElement(code);
+    }
+}
+
+/**
+ * Parse CSV line respecting quoted values (handles commas inside quotes)
+ */
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+
+        if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+                // Escaped quote ""
+                current += '"';
+                i++; // Skip next quote
+            } else {
+                // Toggle quote mode
+                inQuotes = !inQuotes;
+            }
+        } else if (char === ',' && !inQuotes) {
+            // End of field
+            result.push(current.trim());
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+
+    // Don't forget last field
+    result.push(current.trim());
+    return result;
+}
+
+function parseCSVtoTable(csvText) {
+    const lines = csvText.trim().split(/\r?\n/);
+    if (lines.length === 0) return '<p>Empty CSV</p>';
+
+    // Parse headers
+    const headers = parseCSVLine(lines[0]);
+    const numCols = headers.length;
+
+    let html = '<table class="csv-table"><thead><tr>';
+    html += `<th class="row-num">#</th>`; // Row number column
+    headers.forEach(h => html += `<th>${escapeHtml(h)}</th>`);
+    html += '</tr></thead><tbody>';
+
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue; // Skip empty lines
+
+        const row = parseCSVLine(lines[i]);
+
+        html += '<tr>';
+        html += `<td class="row-num">${i}</td>`; // Row number
+        for (let j = 0; j < numCols; j++) {
+            const cell = row[j] || '';
+            // Truncate very long cells for display
+            const displayCell = cell.length > 100 ? cell.substring(0, 100) + '...' : cell;
+            html += `<td title="${escapeHtml(cell)}">${escapeHtml(displayCell)}</td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+
+    // Add row count info
+    const rowCount = lines.length - 1;
+    html = `<div class="csv-info">${rowCount} rows × ${numCols} columns</div>` + html;
+
+    return html;
+}
+
+function closeFilePreview() {
+    filePreviewPanel.classList.add('hidden');
+    currentPreviewPath = null;
+    currentPreviewContent = null;
+}
+
+async function copyFileContent() {
+    if (!currentPreviewContent) return;
+    try {
+        await navigator.clipboard.writeText(currentPreviewContent);
+        const btn = filePreviewPanel.querySelector('.preview-btn[onclick="copyFileContent()"]');
+        const originalIcon = btn.innerHTML;
+        btn.innerHTML = '<i class="ri-check-line" style="color: var(--success)"></i>';
+        setTimeout(() => btn.innerHTML = originalIcon, 1000);
+    } catch (error) {
+        console.error('Failed to copy:', error);
+    }
+}
+
+function downloadPreviewFile() {
+    if (!currentPreviewPath || !currentPreviewContent) return;
+    const filename = currentPreviewPath.split('/').pop();
+    const blob = new Blob([currentPreviewContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function getFileIconClass(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const icons = {
+        'py': 'ri-code-s-slash-line',
+        'js': 'ri-javascript-line',
+        'ts': 'ri-braces-line',
+        'json': 'ri-braces-line',
+        'csv': 'ri-grid-line',
+        'md': 'ri-markdown-line',
+        'txt': 'ri-file-text-line',
+        'html': 'ri-html5-line',
+        'css': 'ri-css3-line',
+        'pdf': 'ri-file-pdf-line',
+        'zip': 'ri-file-zip-line',
+        'png': 'ri-image-line',
+        'jpg': 'ri-image-line'
+    };
+    return icons[ext] || 'ri-file-line';
+}
+
+function linkifyFilePaths(html) {
+    const pathPattern = /(\/(?:workspace|uploads|app|home|tmp|var|etc)\/[^\s<>"'`,;()[\]{}]+\.[a-zA-Z0-9]+)/g;
+    return html.replace(pathPattern, (match, path) => {
+        const cleanPath = path.replace(/[.,;:!?)]+$/, '');
+        const trailing = path.slice(cleanPath.length);
+        return `<span class="file-link" onclick="openFilePreview('${cleanPath}')" title="Click to preview">${escapeHtml(cleanPath)}</span>${trailing}`;
+    });
 }

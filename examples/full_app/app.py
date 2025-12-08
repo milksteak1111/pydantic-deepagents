@@ -648,6 +648,52 @@ async def download_file(filepath: str, session_id: str = Query(..., description=
     )
 
 
+@app.get("/files/content/{filepath:path}")
+async def get_file_content(filepath: str, session_id: str = Query(..., description="Session ID")):
+    """Get file content for preview (supports any path in the container).
+
+    Args:
+        filepath: Full path to file (e.g., /workspace/script.py or /uploads/data.csv)
+        session_id: Session ID
+    """
+    if session_id not in user_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = user_sessions[session_id]
+
+    # Decode the path if it was URL-encoded
+    import urllib.parse
+
+    decoded_path = urllib.parse.unquote(filepath)
+
+    # Ensure path starts with /
+    if not decoded_path.startswith("/"):
+        decoded_path = "/" + decoded_path
+
+    logger.debug(f"Reading file: {decoded_path} for session {session_id}")
+
+    # Read file from container
+    try:
+        result = session.deps.backend.read(decoded_path)
+
+        # Check for error patterns in result
+        if result.startswith("Error:") or "No such file" in result:
+            raise HTTPException(status_code=404, detail=f"File not found: {decoded_path}")
+
+        return JSONResponse(
+            content={
+                "path": decoded_path,
+                "filename": decoded_path.split("/")[-1],
+                "content": result,
+                "size": len(result),
+            }
+        )
+    except Exception as e:
+        if "404" in str(e) or "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=f"File not found: {decoded_path}") from e
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
 @app.get("/todos")
 async def get_todos(session_id: str = Query(..., description="Session ID")):
     """Get current todo list for a specific session."""
