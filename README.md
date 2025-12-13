@@ -160,6 +160,10 @@ make test
 make all
 ```
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=vstorm-co/pydantic-deepagents&type=date&legend=top-left)](https://www.star-history.com/#vstorm-co/pydantic-deepagents&type=date&legend=top-left)
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
