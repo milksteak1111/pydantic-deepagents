@@ -1,6 +1,6 @@
 [project]
 name = "pydantic-deep"
-version = "0.2.6"
+version = "0.2.7"
 description = "Deep Agent framework built on Pydantic-ai with planning, filesystem, and subagent capabilities"
 readme = "README.md"
 license = "MIT"
@@ -46,6 +46,7 @@ dev = [
 Homepage = "https://github.com/vstorm-co/pydantic-deepagents"
 Documentation = "https://github.com/vstorm-co/pydantic-deepagents"
 Repository = "https://github.com/vstorm-co/pydantic-deepagents"
+Issues = "https://github.com/vstorm-co/pydantic-deepagents/issues"
 
 [build-system]
 requires = ["hatchling"]
@@ -171,5 +172,3 @@ disable_error_code = ["arg-type", "list-item", "abstract"]
 [tool.codespell]
 skip = ".git,.venv*,uv.lock,site,htmlcov,.coverage"
 
-[tool.uv.sources]
-pydantic-ai-todo = { path = "../pydantic-ai-todo" }

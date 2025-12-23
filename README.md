@@ -2,6 +2,8 @@
 
 > **Looking for a full-stack template?** Check out [fastapi-fullstack](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) - a production-ready project generator for AI/LLM applications with FastAPI, Next.js, and pydantic-deep integration.
 
+> **Need just the todo toolset?** Check out [pydantic-ai-todo](https://github.com/vstorm-co/pydantic-ai-todo) - standalone task planning toolset that works with any pydantic-ai agent.
+
 [![PyPI version](https://img.shields.io/pypi/v/pydantic-deep.svg)](https://pypi.org/project/pydantic-deep/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
