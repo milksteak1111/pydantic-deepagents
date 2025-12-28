@@ -43,7 +43,7 @@ class TestFilesystemToolsetExtended:
         from pydantic_ai_backends import SandboxProtocol
 
         # Create a mock sandbox backend
-        class MockSandbox(SandboxProtocol):
+        class MockSandbox(SandboxProtocol):  # type: ignore[misc]
             def execute(self, command, timeout=None):
                 pass
 

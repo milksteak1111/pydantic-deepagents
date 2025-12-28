@@ -102,7 +102,8 @@ def create_filesystem_toolset(  # noqa: C901
             offset: Line number to start reading from (0-indexed).
             limit: Maximum number of lines to read.
         """
-        return ctx.deps.backend.read(path, offset, limit)
+        result: str = ctx.deps.backend.read(path, offset, limit)
+        return result
 
     @toolset.tool(requires_approval=require_write_approval)
     async def write_file(  # pragma: no cover
@@ -262,7 +263,7 @@ def create_filesystem_toolset(  # noqa: C901
             if result.exit_code is not None and result.exit_code != 0:
                 return f"Command failed (exit code {result.exit_code}):\n{output}"
 
-            return output
+            return str(output)
 
     return toolset
 
