@@ -1,5 +1,14 @@
 # Backends
 
+!!! info "Standalone Library Available"
+    Backends are available as a standalone library: [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend)
+
+    ```bash
+    pip install pydantic-ai-backend
+    ```
+
+    This allows using backends with any pydantic-ai agent, not just pydantic-deep.
+
 Backends provide file storage for deep agents. All backends implement the `BackendProtocol`.
 
 ## Available Backends

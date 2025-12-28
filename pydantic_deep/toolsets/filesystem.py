@@ -7,9 +7,9 @@ from typing import Literal
 from pydantic_ai import RunContext
 from pydantic_ai.toolsets import FunctionToolset
 
-from pydantic_deep.backends.protocol import SandboxProtocol
+from pydantic_ai_backends import GrepMatch, SandboxProtocol
+
 from pydantic_deep.deps import DeepAgentDeps
-from pydantic_deep.types import GrepMatch
 
 FILESYSTEM_SYSTEM_PROMPT = """
 ## Filesystem Tools

@@ -1,5 +1,11 @@
 # Docker Sandbox Example
 
+!!! tip "Standalone Usage"
+    DockerSandbox is also available in [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend) for use with any pydantic-ai agent:
+    ```bash
+    pip install pydantic-ai-backend[docker]
+    ```
+
 This example demonstrates isolated code execution using DockerSandbox.
 
 ## Source Code

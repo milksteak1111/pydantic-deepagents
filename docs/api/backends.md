@@ -1,5 +1,8 @@
 # Backends API
 
+!!! info "Standalone Library"
+    These backends are also available as [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend) for use with any pydantic-ai agent.
+
 ## Protocols
 
 ### BackendProtocol

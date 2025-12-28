@@ -2,7 +2,7 @@
 
 from pydantic_ai_todo import create_todo_toolset, get_todo_system_prompt
 
-from pydantic_deep.backends.state import StateBackend
+from pydantic_ai_backends import StateBackend
 from pydantic_deep.deps import DeepAgentDeps
 from pydantic_deep.toolsets.filesystem import (
     _get_runtime_system_prompt,

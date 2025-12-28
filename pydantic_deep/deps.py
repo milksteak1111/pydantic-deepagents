@@ -8,8 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 import chardet
 
-from pydantic_deep.backends.protocol import BackendProtocol
-from pydantic_deep.backends.state import StateBackend
+from pydantic_ai_backends import BackendProtocol, StateBackend
 from pydantic_deep.types import FileData, Todo, UploadedFile
 
 if TYPE_CHECKING:

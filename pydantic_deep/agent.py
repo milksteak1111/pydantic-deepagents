@@ -12,8 +12,7 @@ from pydantic_ai.output import OutputSpec
 from pydantic_ai.tools import DeferredToolRequests, Tool
 from pydantic_ai_todo import create_todo_toolset, get_todo_system_prompt
 
-from pydantic_deep.backends.protocol import BackendProtocol, SandboxProtocol
-from pydantic_deep.backends.state import StateBackend
+from pydantic_ai_backends import BackendProtocol, SandboxProtocol, StateBackend
 from pydantic_deep.deps import DeepAgentDeps
 from pydantic_deep.toolsets.filesystem import (
     create_filesystem_toolset,
@@ -378,7 +377,7 @@ async def run_with_files(
     Example:
         ```python
         from pydantic_deep import create_deep_agent, DeepAgentDeps, run_with_files
-        from pydantic_deep.backends import StateBackend
+        from pydantic_ai_backends import StateBackend
 
         agent = create_deep_agent()
         deps = DeepAgentDeps(backend=StateBackend())

@@ -29,6 +29,9 @@ uv add pydantic-deep[sandbox]
 pip install pydantic-deep[sandbox]
 ```
 
+!!! tip "Standalone Usage"
+    Backends are also available separately as [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend) for use with any pydantic-ai agent.
+
 ### Development
 
 For running tests and building documentation:
