@@ -67,11 +67,13 @@ logger = logging.getLogger(__name__)
 # Paths
 APP_DIR = Path(__file__).parent
 WORKSPACE_DIR = APP_DIR / "workspace"
+WORKSPACES_DIR = APP_DIR / "workspaces"  # Per-session persistent storage
 SKILLS_DIR = APP_DIR / "skills"
 STATIC_DIR = APP_DIR / "static"
 
-# Create workspace if it doesn't exist
+# Create directories if they don't exist
 WORKSPACE_DIR.mkdir(exist_ok=True)
+WORKSPACES_DIR.mkdir(exist_ok=True)
 
 
 @dataclass
@@ -266,11 +268,13 @@ async def lifespan(app: FastAPI):
     session_manager = SessionManager(
         default_runtime=None,  # Will use default python:3.12-slim
         default_idle_timeout=3600,  # 1 hour idle timeout
+        workspace_root=WORKSPACES_DIR,  # Persistent storage for user files
     )
     session_manager.start_cleanup_loop(interval=300)  # Cleanup every 5 min
 
     print("Agent initialized (shared across sessions)")
     print(f"Skills directory: {SKILLS_DIR}")
+    print(f"Persistent workspaces: {WORKSPACES_DIR}")
     print("Session manager started with auto-cleanup")
     yield
 
