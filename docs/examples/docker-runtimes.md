@@ -154,8 +154,46 @@ await manager.shutdown()
 SessionManager(
     default_runtime="python-datascience",  # Default for new sessions
     default_idle_timeout=3600,             # 1 hour idle timeout
+    workspace_root="/var/app/workspaces",  # Persistent storage directory
 )
 ```
+
+### Persistent Storage with workspace_root
+
+By default, files in Docker containers are lost when the container stops. Use `workspace_root` to automatically persist files for each session:
+
+```python
+manager = SessionManager(
+    default_runtime="python-datascience",
+    workspace_root="/var/app/workspaces",  # Base directory
+)
+
+# For user-123, creates: /var/app/workspaces/user-123/workspace/
+# Mounted as /workspace in container
+sandbox = await manager.get_or_create("user-123")
+
+# Files persist even after container stops
+await sandbox.write("/workspace/report.pdf", pdf_content)
+await manager.shutdown()
+
+# Later, when user returns...
+sandbox = await manager.get_or_create("user-123")
+content = await sandbox.read("/workspace/report.pdf")  # Still there!
+```
+
+!!! tip "Directory Structure"
+    ```
+    /var/app/workspaces/
+    ├── user-123/
+    │   └── workspace/        → mounted as /workspace
+    │       ├── report.pdf
+    │       └── data.csv
+    ├── user-456/
+    │   └── workspace/
+    │       └── analysis.py
+    └── user-789/
+        └── workspace/
+    ```
 
 ## Complete Example
 
@@ -181,6 +219,7 @@ async def main():
     manager = SessionManager(
         default_runtime=runtime,
         default_idle_timeout=1800,  # 30 minutes
+        workspace_root="./workspaces",  # Persist user files
     )
 
     try:

@@ -152,6 +152,7 @@ async def lifespan(app: FastAPI):
     session_manager = SessionManager(
         default_runtime=None,
         default_idle_timeout=3600,
+        workspace_root="./workspaces",  # Persistent storage for user files
     )
     session_manager.start_cleanup_loop(interval=300)
 
@@ -160,6 +161,8 @@ async def lifespan(app: FastAPI):
     # Cleanup
     await session_manager.shutdown()
 ```
+
+With `workspace_root`, each session gets persistent storage at `./workspaces/{session_id}/workspace/`, so user files survive container restarts and app reboots.
 
 ### WebSocket Streaming
 

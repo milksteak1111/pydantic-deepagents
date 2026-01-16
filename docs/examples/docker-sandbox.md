@@ -108,9 +108,73 @@ sandbox = DockerSandbox(
 sandbox = DockerSandbox(
     image="python:3.12",
     work_dir="/app",
-    # Additional options can be added to the implementation
+    auto_remove=True,       # Remove container on stop
+    idle_timeout=3600,      # Container lifetime in seconds
 )
 ```
+
+### Persistent Storage with Volumes
+
+By default, files inside the Docker container are lost when the container stops. Use `volumes` to persist files on the host filesystem:
+
+```python
+sandbox = DockerSandbox(
+    image="python:3.12-slim",
+    volumes={
+        "/path/on/host": "/workspace",  # host_path: container_path
+    },
+)
+
+# Files written to /workspace persist on /path/on/host
+sandbox.write("/workspace/data.json", '{"key": "value"}')
+sandbox.stop()
+
+# Later, files are still there when container restarts
+sandbox = DockerSandbox(
+    image="python:3.12-slim",
+    volumes={"/path/on/host": "/workspace"},
+)
+content = sandbox.read("/workspace/data.json")  # '{"key": "value"}'
+```
+
+Multiple volume mappings are supported:
+
+```python
+sandbox = DockerSandbox(
+    image="python:3.12-slim",
+    volumes={
+        "/host/workspace": "/workspace",
+        "/host/data": "/data",
+        "/host/config": "/config",
+    },
+)
+```
+
+### Automatic Persistent Storage with SessionManager
+
+For multi-user applications, `SessionManager` provides automatic per-session persistent storage:
+
+```python
+from pydantic_deep import SessionManager
+
+# Create manager with workspace_root
+manager = SessionManager(
+    workspace_root="/var/app/workspaces",  # Base directory for all sessions
+)
+
+# Each session gets its own persistent directory
+sandbox = manager.get_or_create("user-123")
+# Creates: /var/app/workspaces/user-123/workspace/
+# Mounted as: /workspace in container
+
+# User returns later - files still there
+sandbox2 = manager.get_or_create("user-123")
+content = sandbox2.read("/workspace/previous_file.py")  # Still exists!
+```
+
+!!! tip "When to Use Each Approach"
+    - **`volumes`**: Direct control over mount points, custom paths
+    - **`workspace_root`**: Automatic per-session directories, multi-user apps
 
 ## Execution
 
