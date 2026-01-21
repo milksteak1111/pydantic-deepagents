@@ -1,5 +1,10 @@
 # Skills
 
+!!! note "Future Migration"
+    This implementation will be removed when skills support is added to pydantic-ai core.
+    See [pydantic-ai#3780](https://github.com/pydantic/pydantic-ai/pull/3780) for progress.
+    We will migrate to use the upstream implementation once available.
+
 Skills are modular packages that extend agent capabilities through filesystem-based configuration. They enable **progressive disclosure** - only loading detailed instructions when needed.
 
 ## What are Skills?

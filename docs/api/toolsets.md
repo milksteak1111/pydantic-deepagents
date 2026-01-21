@@ -246,6 +246,10 @@ class SubAgentConfig(TypedDict, total=False):
 
 ## SkillsToolset
 
+!!! note "Future Migration"
+    This implementation will be removed when skills support is added to pydantic-ai core.
+    See [pydantic-ai#3780](https://github.com/pydantic/pydantic-ai/pull/3780) for progress.
+
 Modular capability tools.
 
 ### Tools
