@@ -169,6 +169,7 @@ agent = create_deep_agent(history_processors=[processor])
 - **[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend)** - File storage and sandbox backends (extracted from pydantic-deep)
 - **[pydantic-ai-todo](https://github.com/vstorm-co/pydantic-ai-todo)** - Task planning toolset (extracted from pydantic-deep)
 - **[fastapi-fullstack](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template)** - Full-stack AI app template with pydantic-deep
+- **[deepagents](https://github.com/langchain-ai/deepagents)** - Deep Agent implementation built on LangChain and LangGraph
 
 ## Development
 
