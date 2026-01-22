@@ -87,6 +87,8 @@ pydantic-deep implements the **deep agent architecture** — the same patterns p
 
 **Now you can build the same thing.**
 
+> **Inspired by:** This framework is also inspired by [LangChain's Deep Agents](https://github.com/langchain-ai/deepagents) research on autonomous agent architectures.
+
 ---
 
 ## Features
