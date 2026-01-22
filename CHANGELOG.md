@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** Removed local `pydantic_deep/processors/` module - now uses external [summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) library
 - **Breaking:** Removed local `pydantic_deep/toolsets/subagents.py` module - now uses external [subagents-pydantic-ai](https://github.com/vstorm-co/subagents-pydantic-ai) library
 - Added `summarization-pydantic-ai>=0.0.1` dependency
-- Added `subagents-pydantic-ai>=0.0.1` dependency
+- Added `subagents-pydantic-ai>=0.0.2` dependency
 - Re-exported `SummarizationProcessor`, `SlidingWindowProcessor`, `create_summarization_processor`, `create_sliding_window_processor` from summarization-pydantic-ai
 - Re-exported `SubAgentToolset`, `create_subagent_toolset`, `get_subagent_system_prompt` from subagents-pydantic-ai
 - Re-exported `SubAgentConfig`, `CompiledSubAgent` types from subagents-pydantic-ai

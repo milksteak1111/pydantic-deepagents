@@ -94,7 +94,7 @@ Pydantic Deep Agents is built from standalone packages you can use independently
 |---------|-------------|
 | [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) | File storage, Docker sandbox, permission controls |
 | [pydantic-ai-todo](https://github.com/vstorm-co/pydantic-ai-todo) | Task planning with PostgreSQL and event streaming |
-| [subagents-pydantic-ai](https://github.com/vstorm-co/subagents-pydantic-ai) | Dual-mode subagent execution |
+| [subagents-pydantic-ai](https://github.com/vstorm-co/subagents-pydantic-ai) | Multi-agent orchestration |
 | [summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) | Context management processors |
 
 ## Installation
