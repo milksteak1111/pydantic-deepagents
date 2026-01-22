@@ -24,7 +24,7 @@ classifiers = [
 ]
 dependencies = [
     "pydantic-ai-slim>=0.1.0",
-    "pydantic-ai-todo>=0.1.0",
+    "pydantic-ai-todo>=0.1.4",
     "pydantic-ai-backend[console]>=0.1.0",
     "summarization-pydantic-ai>=0.0.1",
     "subagents-pydantic-ai>=0.0.2",
